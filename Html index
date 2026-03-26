@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Город моей мечты - Нью-Гармония</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- Навигация -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-brand">
+                <i class="fas fa-city"></i>
+                <h2>Город Мечты</h2>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="#home" class="active">Главная</a></li>
+                <li><a href="#about">О городе</a></li>
+                <li><a href="#attractions">Достопримечательности</a></li>
+                <li><a href="#gallery">Галерея</a></li>
+                <li><a href="#contact">Контакты</a></li>
+            </ul>
+            <div class="burger">
+                <i class="fas fa-bars"></i>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero секция -->
+    <section id="home" class="hero">
+        <div class="hero-overlay"></div>
+        <div class="hero-content">
+            <h1 class="animate-title" id="city-name">Город моей мечты</h1>
+            <p class="animate-text" id="city-motto"></p>
+            <button class="btn-primary" onclick="scrollToSection('about')">
+                <i class="fas fa-arrow-down"></i> Узнать больше
+            </button>
+        </div>
+    </section>
+
+    <!-- О городе -->
+    <section id="about" class="about">
+        <div class="container">
+            <h2 class="section-title">О городе</h2>
+            <div class="about-content">
+                <div class="about-text">
+                    <p id="city-description">Загрузка...</p>
+                    <div class="features-list" id="features-list"></div>
+                </div>
+                <div class="stats">
+                    <div class="stat-card">
+                        <i class="fas fa-users"></i>
+                        <h3 id="population">-</h3>
+                        <p>Население</p>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-calendar-alt"></i>
+                        <h3 id="founded">-</h3>
+                        <p>Год основания</p>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <h3 id="area">-</h3>
+                        <p>Площадь (км²)</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Достопримечательности -->
+    <section id="attractions" class="attractions">
+        <div class="container">
+            <h2 class="section-title">Достопримечательности</h2>
+            <div class="attractions-grid" id="attractions-grid">
+                <div class="loading"><i class="fas fa-spinner fa-spin"></i> Загрузка...</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Галерея -->
+    <section id="gallery" class="gallery">
+        <div class="container">
+            <h2 class="section-title">Галерея</h2>
+            <div class="gallery-grid" id="gallery-grid">
+                <div class="loading"><i class="fas fa-spinner fa-spin"></i> Загрузка...</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Контакты -->
+    <section id="contact" class="contact">
+        <div class="container">
+            <h2 class="section-title">Контакты</h2>
+            <div class="contact-content">
+                <form id="contact-form">
+                    <h3>Напишите нам</h3>
+                    <input type="text" placeholder="Ваше имя" required>
+                    <input type="email" placeholder="Email" required>
+                    <textarea placeholder="Ваше сообщение" rows="5" required></textarea>
+
+<button type="submit" class="btn-primary">
+                        <i class="fas fa-paper-plane"></i> Отправить
+                    </button>
+                </form>
+                <div class="contact-info" id="contact-info">
+                    <h3><i class="fas fa-address-card"></i> Контактная информация</h3>
+                    <div class="loading">Загрузка...</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Футер -->
+    <footer>
+        <div class="container">
+            <p><i class="far fa-copyright"></i> 2024 Город моей мечты - Нью-Гармония. Все права защищены.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Плавная прокрутка
+        function scrollToSection(sectionId) {
+            const section = document.getElementById(sectionId);
+            section.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Загрузка всей информации о городе
+        async function loadCityInfo() {
+            try {
+                const response = await fetch('/api/city-info');
+                const data = await response.json();
+                
+                document.getElementById('city-name').textContent = data.name;
+                document.getElementById('city-motto').textContent = data.motto;
+                document.getElementById('city-description').textContent = data.full_description;
+                document.getElementById('population').textContent = data.population.toLocaleString();
+                document.getElementById('founded').textContent = data.founded;
+                document.getElementById('area').textContent = data.area;
+                
+                // Добавляем ключевые особенности
+                const featuresList = document.getElementById('features-list');
+                featuresList.innerHTML = '<h4>Ключевые особенности:</h4><ul>';
+                data.key_features.forEach(feature => {
+                    featuresList.innerHTML += <li><i class="fas fa-check-circle"></i> ${feature}</li>;
+                });
+                featuresList.innerHTML += '</ul>';
+            } catch (error) {
+                console.error('Ошибка загрузки информации о городе:', error);
+            }
+        }
+
+        // Загрузка достопримечательностей
+        async function loadAttractions() {
+            try {
+                const response = await fetch('/api/attractions');
+                const attractions = await response.json();
+                
+                const grid = document.getElementById('attractions-grid');
+                grid.innerHTML = '';
+                
+                attractions.forEach(attraction => {
+                    const card = document.createElement('div');
+                    card.className = 'attraction-card';
+                    
+                    let stars = '';
+                    for(let i = 0; i < Math.floor(attraction.rating); i++) {
+                        stars += '<i class="fas fa-star"></i>';
+                    }
+                    if(attraction.rating % 1 >= 0.5) {
+                        stars += '<i class="fas fa-star-half-alt"></i>';
+                    }
+                    
+                    card.innerHTML = `
+                        <div class="card-image">
+                            <img src="{{ url_for('static', filename='img/${attraction.image}') }}" alt="${attraction.name}">
+                            <span class="card-type">${attraction.type}</span>
+                        </div>
+                        <div class="card-content">
+                            <h3>${attraction.name}</h3>
+                            <div class="rating">${stars} <span>${attraction.rating}</span></div>
+                            <p>${attraction.description}</p>
+                            <div class="location">
+                                <i class="fas fa-map-pin"></i> ${attraction.location}
+                            </div>
+                        </div>
+                    `;
+                    grid.appendChild(card);
+                });
+            } catch (error) {
+                console.
+
+error('Ошибка загрузки достопримечательностей:', error);
+            }
+        }
+
+        // Загрузка галереи
+        async function loadGallery() {
+            try {
+                const response = await fetch('/api/gallery');
+                const gallery = await response.json();
+                
+                const grid = document.getElementById('gallery-grid');
+                grid.innerHTML = '';
+                
+                gallery.forEach(item => {
+                    const galleryItem = document.createElement('div');
+                    galleryItem.className = 'gallery-item';
+                    galleryItem.innerHTML = `
+                        <img src="{{ url_for('static', filename='img/${item.image}') }}" alt="${item.title}">
+                        <div class="gallery-overlay">
+                            <h4>${item.title}</h4>
+                            <p>${item.description}</p>
+                            <span class="gallery-category">${item.category}</span>
+                        </div>
+                    `;
+                    grid.appendChild(galleryItem);
+                });
+            } catch (error) {
+                console.error('Ошибка загрузки галереи:', error);
+            }
+        }
+
+        // Загрузка контактов
+        async function loadContacts() {
+            try {
+                const response = await fetch('/api/contacts');
+                const contacts = await response.json();
+                
+                const contactInfo = document.getElementById('contact-info');
+                contactInfo.innerHTML = `
+                    <h3><i class="fas fa-address-card"></i> Контактная информация</h3>
+                    <p><i class="fas fa-map-marker-alt"></i> <strong>Адрес:</strong> ${contacts.address}</p>
+                    <p><i class="fas fa-phone"></i> <strong>Телефон:</strong> ${contacts.phone}</p>
+                    <p><i class="fas fa-envelope"></i> <strong>Email:</strong> ${contacts.email}</p>
+                    <p><i class="fas fa-clock"></i> <strong>Режим работы:</strong> ${contacts.working_hours}</p>
+                    <div class="social-media">
+                        <h4>Мы в соцсетях:</h4>
+                        <a href="#"><i class="fab fa-instagram"></i> ${contacts.social_media.instagram}</a>
+                        <a href="#"><i class="fab fa-telegram"></i> ${contacts.social_media.telegram}</a>
+                        <a href="#"><i class="fab fa-youtube"></i> ${contacts.social_media.youtube}</a>
+                    </div>
+                `;
+            } catch (error) {
+                console.error('Ошибка загрузки контактов:', error);
+            }
+        }
+
+        // Обработка формы
+        document.getElementById('contact-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            alert('✨ Спасибо! Ваше сообщение отправлено. Мы свяжемся с вами в ближайшее время!');
+            this.reset();
+        });
+
+        // Мобильное меню
+        document.querySelector('.burger').addEventListener('click', function() {
+            document.querySelector('.nav-menu').classList.toggle('active');
+        });
+
+        // Анимация при скролле
+        window.addEventListener('scroll', () => {
+            const cards = document.querySelectorAll('.attraction-card, .stat-card, .gallery-item');
+            cards.forEach(card => {
+                const cardTop = card.getBoundingClientRect().top;
+                const windowHeight = window.innerHeight;
+                if (cardTop < windowHeight - 100) {
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                }
+            });
+        });
+
+        // Загрузка всех данных
+        loadCityInfo();
+        loadAttractions();
+        loadGallery();
+        loadContacts();
+
+        // Начальные стили для анимации
+        document.querySelectorAll('.attraction-card, .stat-card, .gallery-item').forEach(card => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(30px)';
+            card.style.
+
+transition = 'all 0.6s ease';
+        });
+    </script>
+</body>
+</html>
