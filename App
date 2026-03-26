@@ -1,0 +1,47 @@
+from flask import Flask, render_template, jsonify
+import json
+
+app = Flask(__name__)
+
+# Загрузка данных из JSON файла
+def load_city_data():
+    with open('data/data.json', 'r', encoding='utf-8') as f:
+        return json.load(f)
+
+# Главная страница
+@app.route('/')
+def index():
+    return render_template('index1.html')
+
+# API для получения всех данных
+@app.route('/api/all-data')
+def get_all_data():
+    data = load_city_data()
+    return jsonify(data)
+
+# API для получения информации о городе
+@app.route('/api/city-info')
+def get_city_info():
+    data = load_city_data()
+    return jsonify(data['city_info'])
+
+# API для получения достопримечательностей
+@app.route('/api/attractions')
+def get_attractions():
+    data = load_city_data()
+    return jsonify(data['attractions'])
+
+# API для получения галереи
+@app.route('/api/gallery')
+def get_gallery():
+    data = load_city_data()
+    return jsonify(data['gallery'])
+
+# API для получения контактов
+@app.route('/api/contacts')
+def get_contacts():
+    data = load_city_data()
+    return jsonify(data['contacts'])
+
+if __name__ == '__main__':
+    app.run(debug=True, host='0.0.0.0', port=5000)
